@@ -89,5 +89,20 @@ if [ -d "./config/dotfiles" ]; then
   chown -R cletus:cletus /home/cletus
 fi
 
+# --- Disable root SSH login ---
+echo -e "${YELLOW}🔒 Securing SSH...${NC}"
+SSHD_CONFIG="/etc/ssh/sshd_config"
+
+# Backup first
+cp "$SSHD_CONFIG" "${SSHD_CONFIG}.bak_$(date +%F_%T)"
+
+# Disable root login & password auth
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' "$SSHD_CONFIG"
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' "$SSHD_CONFIG"
+
+# Restart SSH service
+systemctl restart ssh
+echo -e "${GREEN}✅ SSH root login disabled. You can now connect as 'cletus'.${NC}"
+
 echo -e "${GREEN}✅ All configurations applied!${NC}"
 echo -e "${YELLOW}✨ Setup complete — reboot recommended.${NC}"
