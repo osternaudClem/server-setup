@@ -23,5 +23,12 @@ su - cletus -c '
   sed -i "s/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/" ~/.zshrc
 '
 
-chsh -s /bin/zsh root
-ok "Zsh installed for both root and cletus"
+# Default shells
+chsh -s /usr/bin/zsh root
+chsh -s /usr/bin/zsh cletus
+ok "Zsh installed and set as default for root and cletus"
+
+# Auto-reload into zsh if interactive
+if [[ $- == *i* ]]; then
+  exec zsh
+fi
