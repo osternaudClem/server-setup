@@ -20,13 +20,17 @@ read -rp "Enter password for new user 'cletus': " -s USER_PASS
 echo
 useradd -m -s /bin/bash cletus || true
 echo "cletus:$USER_PASS" | chpasswd
-usermod -aG sudo,docker cletus
-echo -e "${GREEN}✅ User 'cletus' created and added to sudo & docker groups${NC}"
+usermod -aG sudo cletus
+echo -e "${GREEN}✅ User 'cletus' created and added to sudo group${NC}"
 
 # --- System update & packages ---
 echo -e "${YELLOW}📦 Installing packages...${NC}"
 apt update && apt upgrade -y
 apt install -y curl git ufw zsh fail2ban docker.io docker-compose caddy bat eza lazydocker vim unzip wget
+
+# --- Add user to docker group ---
+usermod -aG docker cletus
+
 
 # --- Enable & start services ---
 systemctl enable --now docker
