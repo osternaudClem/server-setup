@@ -4,31 +4,30 @@ source "$(dirname "$0")/_lib.sh"
 
 info "Setting up Zsh & Oh My Zsh..."
 
+# Ensure zsh is installed
+apt install -y zsh git curl >/dev/null
+
+# Install Oh My Zsh for root (optional)
+if [ ! -d "/root/.oh-my-zsh" ]; then
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
+
+# Install Oh My Zsh for cletus
 su - cletus -c '
   if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    echo "💫 Installing Oh My Zsh..."
+    echo "💫 Installing Oh My Zsh for cletus..."
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
   fi
-
-  PLUGDIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
-
-  if [ ! -d "$PLUGDIR/zsh-autosuggestions" ]; then
-    git clone https://github.com/zsh-users/zsh-autosuggestions "$PLUGDIR/zsh-autosuggestions"
-  fi
-
-  if [ ! -d "$PLUGDIR/zsh-syntax-highlighting" ]; then
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting "$PLUGDIR/zsh-syntax-highlighting"
-  fi
-
-  sed -i "s/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/" ~/.zshrc
+  mkdir -p ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins
+  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions || true
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting || true
 '
 
-# Default shells
-chsh -s /usr/bin/zsh root
-chsh -s /usr/bin/zsh cletus
-ok "Zsh installed and set as default for root and cletus"
-
-# Auto-reload into zsh if interactive
-if [[ $- == *i* ]]; then
-  exec zsh
+# Apply your custom .zshrc if available
+if [ -f "./config/dotfiles/.zshrc" ]; then
+  cp ./config/dotfiles/.zshrc /home/cletus/.zshrc
+  chown cletus:cletus /home/cletus/.zshrc
+  echo -e "${GREEN}✅ Custom .zshrc applied for cletus${NC}"
 fi
+
+echo -e "${GREEN}✅ Zsh installed for both root and cletus${NC}"
