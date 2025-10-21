@@ -4,6 +4,12 @@ source "$(dirname "$0")/_lib.sh"
 
 info "Finalizing setup..."
 
+# Ensure sudo is installed
+if ! command -v sudo &>/dev/null; then
+  apt update -y >/dev/null
+  apt install -y sudo >/dev/null
+fi
+
 echo -e "${YELLOW}✨ Setup complete — reboot recommended.${NC}"
 
 # If running interactively, auto switch to cletus
