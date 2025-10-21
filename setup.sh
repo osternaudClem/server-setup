@@ -26,7 +26,16 @@ echo -e "${GREEN}✅ User 'cletus' created and added to sudo group${NC}"
 # --- System update & packages ---
 echo -e "${YELLOW}📦 Installing packages...${NC}"
 apt update && apt upgrade -y
-apt install -y curl git ufw zsh fail2ban docker.io docker-compose caddy bat eza lazydocker vim unzip wget
+apt install -y curl git ufw zsh fail2ban docker.io docker-compose caddy bat eza vim unzip wget
+
+# --- Install lazydocker manually (Debian fix) ---
+echo -e "${YELLOW}🐳 Installing lazydocker...${NC}"
+LAZY_VERSION=$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | grep tag_name | cut -d '"' -f 4)
+curl -L "https://github.com/jesseduffield/lazydocker/releases/download/${LAZY_VERSION}/lazydocker_${LAZY_VERSION#v}_Linux_x86_64.tar.gz" -o /tmp/lazydocker.tar.gz
+tar xf /tmp/lazydocker.tar.gz -C /usr/local/bin lazydocker
+chmod +x /usr/local/bin/lazydocker
+echo -e "${GREEN}✅ lazydocker installed${NC}"
+
 
 # --- Add user to docker group ---
 usermod -aG docker cletus
